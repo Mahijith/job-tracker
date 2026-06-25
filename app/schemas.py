@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from datetime import datetime
 from typing import Optional
 from app.models.job import StatusEnum
@@ -9,6 +9,13 @@ class JobCreate(BaseModel):
     location: Optional[str] = None
     status: StatusEnum = StatusEnum.applied
     notes: Optional[str] = None
+
+    @field_validator("company", "role")
+    @classmethod
+    def must_not_be_empty(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("Field cannot be empty or whitespace")
+        return v.strip()
 
 class JobUpdate(BaseModel):
     company: Optional[str] = None

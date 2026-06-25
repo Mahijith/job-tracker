@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.models.job import Job
+from app.models.job import Job, StatusEnum
 from app.schemas import JobCreate, JobUpdate, JobResponse
-from typing import List
+from typing import List, Optional
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 
@@ -16,8 +16,19 @@ def create_job(job: JobCreate, db: Session = Depends(get_db)):
     return db_job
 
 @router.get("/", response_model=List[JobResponse])
-def get_jobs(db: Session = Depends(get_db)):
-    return db.query(Job).all()
+def get_jobs(
+    status: Optional[StatusEnum] = None,
+    company: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 20,
+    db: Session = Depends(get_db)
+):
+    query = db.query(Job)
+    if status:
+        query = query.filter(Job.status == status)
+    if company:
+        query = query.filter(Job.company.ilike(f"%{company}%"))
+    return query.offset(skip).limit(limit).all()
 
 @router.get("/{job_id}", response_model=JobResponse)
 def get_job(job_id: int, db: Session = Depends(get_db)):
