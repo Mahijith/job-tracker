@@ -1,7 +1,32 @@
+# Python
 __pycache__/
 *.pyc
+*.pyo
 .venv/
 *.egg-info/
-.env
 dist/
 build/
+
+# Environment — NEVER commit
+.env
+.env.*
+!.env.example
+
+# Generated files
+*.db
+test.db
+
+# Leftover files
+main.py
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
